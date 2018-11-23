@@ -29,6 +29,8 @@ function updateLight(e) {
 }
 
 function disconnect(e) {
+	// Assume the server died and the lastEvent will be reset
+	lastEvent = 0
 	document.getElementById(current).classList.remove("selected")
 }
 
