@@ -4,6 +4,7 @@ updates = new EventSource("/updates")
 
 updates.addEventListener('update', updateLight)
 updates.addEventListener('message', updateLight)
+updates.addEventListener('error', disconnect)
 
 
 var current = "num-5"
@@ -26,3 +27,8 @@ function updateLight(e) {
 
 	current = target
 }
+
+function disconnect(e) {
+	document.getElementById(current).classList.remove("selected")
+}
+

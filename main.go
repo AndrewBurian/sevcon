@@ -47,8 +47,12 @@ func main() {
 	updateStream := eventsource.NewStream()
 	mux.Handle("/updates", updateStream)
 
+	// Setup Monitor
+	mon := &ConditionMonitor{}
+
 	// kick of PD polling service
-	go PollUpdates(updateStream)
+	go mon.PollUpdates(updateStream)
+	updateStream.ClientConnectHook(mon.NewClient)
 
 	server := &http.Server{
 		Addr:    fmt.Sprintf("0.0.0.0:%d", port),
