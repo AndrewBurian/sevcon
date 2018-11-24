@@ -35,7 +35,7 @@ func (mon *ConditionMonitor) PollUpdates(stream *eventsource.Stream) {
 		Statuses: []string{"triggered", "acknowledged"},
 	}
 
-	ticks := time.After(time.Second * 5)
+	ticks := time.Tick(time.Minute)
 	for _ = range ticks {
 
 		log.Debug("Getting Incidents")
