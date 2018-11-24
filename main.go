@@ -31,6 +31,7 @@ func main() {
 
 	if debug {
 		log.SetLevel(log.DebugLevel)
+		log.Debug("Running at debug verbosity")
 	} else if quiet {
 		log.SetLevel(log.ErrorLevel)
 	} else {
@@ -47,8 +48,13 @@ func main() {
 	updateStream := eventsource.NewStream()
 	mux.Handle("/updates", updateStream)
 
+	token, found := os.LookupEnv("PAGERDUTY_TOKEN")
+	if !found {
+		log.Fatal("Need PAGERDUTY_TOKEN env variable")
+	}
+
 	// Setup Monitor
-	mon := &ConditionMonitor{}
+	mon := SetupMonitor(token)
 
 	// kick of PD polling service
 	go mon.PollUpdates(updateStream)
