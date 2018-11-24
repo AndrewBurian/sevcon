@@ -32,7 +32,9 @@ func (mon *ConditionMonitor) PollUpdates(stream *eventsource.Stream) {
 	mon.latestEvent = eventsource.DataEvent("5").ID("1")
 
 	opts := pagerduty.ListIncidentsOptions{
-		Statuses: []string{"triggered", "acknowledged"},
+		Statuses:  []string{"triggered", "acknowledged"},
+		Urgencies: []string{"high"},
+		Includes:  []string{"priorities"},
 	}
 
 	ticks := time.Tick(time.Minute)
@@ -49,6 +51,10 @@ func (mon *ConditionMonitor) PollUpdates(stream *eventsource.Stream) {
 		highest = 5
 		log.WithField("count", len(response.Incidents)).Debug("Processing Incidents")
 		for _, incident := range response.Incidents {
+			if incident.Priority.ID == "" {
+				log.Debug("Incident with no priority skipped")
+				continue
+			}
 			n, err := fmt.Sscanf(incident.Priority.Summary, "SEV-%d", &cur)
 			if err != nil || n != 1 {
 				log.WithError(err).Error("Could not parse sev score")
