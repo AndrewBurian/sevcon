@@ -17,12 +17,13 @@ import (
 
 func main() {
 	// Flags
-	var debug, quiet bool
+	var debug, quiet, test bool
 	var port uint
 
 	flag.BoolVar(&debug, "debug", false, "Debug verbosity")
 	flag.BoolVar(&quiet, "quiet", false, "Errors only")
 	flag.UintVar(&port, "port", 8080, "Port to bind to")
+	flag.BoolVar(&test, "test", false, "Rotates status on a pattern instead of using real data")
 	flag.Parse()
 
 	if debug && quiet {
@@ -48,17 +49,22 @@ func main() {
 	updateStream := eventsource.NewStream()
 	mux.Handle("/updates", updateStream)
 
-	token, found := os.LookupEnv("PAGERDUTY_TOKEN")
-	if !found {
-		log.Fatal("Need PAGERDUTY_TOKEN env variable")
+	if test {
+		log.Warn("Running in test mode, no real data is being used")
+		go DanceUpdates(updateStream)
+	} else {
+		token, found := os.LookupEnv("PAGERDUTY_TOKEN")
+		if !found {
+			log.Fatal("Need PAGERDUTY_TOKEN env variable")
+		}
+
+		// Setup Monitor
+		mon := SetupMonitor(token)
+
+		// kick of PD polling service
+		go mon.PollUpdates(updateStream)
+		updateStream.ClientConnectHook(mon.NewClient)
 	}
-
-	// Setup Monitor
-	mon := SetupMonitor(token)
-
-	// kick of PD polling service
-	go mon.PollUpdates(updateStream)
-	updateStream.ClientConnectHook(mon.NewClient)
 
 	server := &http.Server{
 		Addr:    fmt.Sprintf("0.0.0.0:%d", port),
