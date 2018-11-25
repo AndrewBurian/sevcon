@@ -16,14 +16,20 @@ import (
 
 func main() {
 	// Flags
-	var debug, quiet, test bool
+	var debug, quiet, test, help bool
 	var port uint
 
 	flag.BoolVar(&debug, "debug", false, "Debug verbosity")
 	flag.BoolVar(&quiet, "quiet", false, "Errors only")
 	flag.UintVar(&port, "port", 8080, "Port to bind to")
 	flag.BoolVar(&test, "test", false, "Rotates status on a pattern instead of using real data")
+	flag.BoolVar(&help, "help", false, "Display usage")
 	flag.Parse()
+
+	if help {
+		flag.Usage()
+		return
+	}
 
 	if debug && quiet {
 		log.Fatal("Can only set one of -quiet and -debug")

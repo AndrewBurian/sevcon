@@ -11,7 +11,6 @@ var current = "num-5"
 var lastEvent = 0
 
 function updateLight(e) {
-	console.log("Got event")
 	if(e.lastEventId == null || e.id <= lastEvent){
 		console.log("skipping duplicate")
 		return
@@ -20,7 +19,6 @@ function updateLight(e) {
 	lastEvent = e.lastEventId
 
 	target = `num-${e.data}`
-	console.log(`Setting target to ${target}`)
 
 	document.getElementById(current).classList.remove("selected")
 	document.getElementById(target).classList.add("selected")

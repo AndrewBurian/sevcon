@@ -25,10 +25,15 @@ func SetupMonitor(token string) *ConditionMonitor {
 
 func (mon *ConditionMonitor) PollUpdates(stream *eventsource.Stream) {
 
+	// Events are created of type "update" starting from ID 2
 	evFact := eventsource.EventIDFactory{
 		Next: 2,
+		NewFact: &eventsource.EventTypeFactory{
+			Type: "update",
+		},
 	}
 
+	// ID 1 is a fake event so we always have one for new clients
 	mon.latestEvent = eventsource.DataEvent("5").ID("1")
 
 	opts := pagerduty.ListIncidentsOptions{
@@ -91,6 +96,9 @@ func (mon *ConditionMonitor) NewClient(_ *http.Request, c *eventsource.Client) {
 func DanceUpdates(stream *eventsource.Stream) {
 	evFact := eventsource.EventIDFactory{
 		Next: 1,
+		NewFact: &eventsource.EventTypeFactory{
+			Type: "update",
+		},
 	}
 	ticks := time.Tick(time.Second)
 	count := uint8(1)
