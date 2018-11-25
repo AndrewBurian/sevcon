@@ -18,12 +18,14 @@ func main() {
 	// Flags
 	var debug, quiet, test, help bool
 	var port uint
+	var rate string
 
 	flag.BoolVar(&debug, "debug", false, "Debug verbosity")
 	flag.BoolVar(&quiet, "quiet", false, "Errors only")
 	flag.UintVar(&port, "port", 8080, "Port to bind to")
 	flag.BoolVar(&test, "test", false, "Rotates status on a pattern instead of using real data")
 	flag.BoolVar(&help, "help", false, "Display usage")
+	flag.StringVar(&rate, "rate", "1m", "Update polling rate")
 	flag.Parse()
 
 	if help {
@@ -54,9 +56,15 @@ func main() {
 	updateStream := eventsource.NewStream()
 	mux.Handle("/updates", updateStream)
 
+	// Polling rate
+	pollRate, err := time.ParseDuration(rate)
+	if err != nil {
+		log.WithError(err).Fatal("Unable to parse polling rate")
+	}
+
 	if test {
 		log.Warn("Running in test mode, no real data is being used")
-		go DanceUpdates(updateStream)
+		go DanceUpdates(updateStream, pollRate)
 	} else {
 		token, found := os.LookupEnv("PAGERDUTY_TOKEN")
 		if !found {
@@ -67,7 +75,7 @@ func main() {
 		mon := SetupMonitor(token)
 
 		// kick of PD polling service
-		go mon.PollUpdates(updateStream)
+		go mon.PollUpdates(updateStream, pollRate)
 		updateStream.ClientConnectHook(mon.NewClient)
 	}
 

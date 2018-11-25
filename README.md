@@ -13,6 +13,7 @@ Other flags available:
 - `-quiet`: log errors only
 - `-port <n>`: bind to the specific port (default 8080)
 - `-test`: don't call the PD API, and instead just rotate through levels
+- `-rate`: adjust the polling rate (default 1m)
 
 ## Web Interface
 SEVCON runs a web interface at the root of the project `/` or `/index.html`.

@@ -23,7 +23,7 @@ func SetupMonitor(token string) *ConditionMonitor {
 	}
 }
 
-func (mon *ConditionMonitor) PollUpdates(stream *eventsource.Stream) {
+func (mon *ConditionMonitor) PollUpdates(stream *eventsource.Stream, rate time.Duration) {
 
 	// Events are created of type "update" starting from ID 2
 	evFact := eventsource.EventIDFactory{
@@ -42,7 +42,7 @@ func (mon *ConditionMonitor) PollUpdates(stream *eventsource.Stream) {
 		Includes:  []string{"priorities"},
 	}
 
-	ticks := time.Tick(time.Minute)
+	ticks := time.Tick(rate)
 	for range ticks {
 
 		log.Debug("Getting Incidents")
@@ -93,16 +93,16 @@ func (mon *ConditionMonitor) NewClient(_ *http.Request, c *eventsource.Client) {
 	}
 }
 
-func DanceUpdates(stream *eventsource.Stream) {
+func DanceUpdates(stream *eventsource.Stream, rate time.Duration) {
 	evFact := eventsource.EventIDFactory{
 		Next: 1,
 		NewFact: &eventsource.EventTypeFactory{
 			Type: "update",
 		},
 	}
-	ticks := time.Tick(time.Second)
+	ticks := time.Tick(rate)
 	count := uint8(1)
-	for _ = range ticks {
+	for range ticks {
 		ev := evFact.New()
 		fmt.Fprintf(ev, "%d", (count%5)+1)
 		count++
