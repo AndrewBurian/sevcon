@@ -38,7 +38,7 @@ func (mon *ConditionMonitor) PollUpdates(stream *eventsource.Stream) {
 	}
 
 	ticks := time.Tick(time.Minute)
-	for _ = range ticks {
+	for range ticks {
 
 		log.Debug("Getting Incidents")
 		response, err := mon.client.ListIncidents(opts)

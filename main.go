@@ -11,7 +11,6 @@ import (
 	"time"
 
 	"github.com/AndrewBurian/eventsource"
-	//	"github.com/AndrewBurian/powermux"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -83,6 +82,7 @@ func main() {
 		if err != nil && err != http.ErrServerClosed {
 			log.WithError(err).Error("Error shutting down server")
 		}
+		updateStream.Shutdown()
 	}()
 
 	// Run server
