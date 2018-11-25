@@ -60,9 +60,12 @@ func (mon *ConditionMonitor) PollUpdates(stream *eventsource.Stream, rate time.D
 				log.Debug("Incident with no priority skipped")
 				continue
 			}
-			n, err := fmt.Sscanf(incident.Priority.Summary, "SEV-%d", &cur)
-			if err != nil || n != 1 {
-				log.WithError(err).Error("Could not parse sev score")
+			_, err = fmt.Sscanf(incident.Priority.Summary, "SEV-%d", &cur)
+			if err != nil {
+				log.WithField("parse_string", incident.Priority.Summary).
+					WithField("expected_format", "SEV-%d").
+					WithError(err).
+					Error("Could not parse sev score")
 				continue
 			}
 
