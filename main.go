@@ -10,7 +10,7 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/AndrewBurian/eventsource"
+	"github.com/AndrewBurian/eventsource/v2"
 	log "github.com/sirupsen/logrus"
 )
 

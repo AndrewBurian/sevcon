@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/AndrewBurian/eventsource"
+	"github.com/AndrewBurian/eventsource/v2"
 	"github.com/PagerDuty/go-pagerduty"
 	log "github.com/sirupsen/logrus"
 )
