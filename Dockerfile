@@ -1,10 +1,10 @@
-FROM golang:1.11 AS build
-ADD . /go/src/sevcon
-WORKDIR /go/src/sevcon
+FROM golang:1.12 AS build
+ADD . /sevcon
+WORKDIR /sevcon
 RUN go build -v
 
 FROM gcr.io/distroless/base
 WORKDIR /app
 ADD ./site /app/site
-COPY --from=build /go/src/sevcon/sevcon /app/sevcon
+COPY --from=build /sevcon/sevcon /app/sevcon
 ENTRYPOINT ["/app/sevcon"]
